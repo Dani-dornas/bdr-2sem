@@ -1,68 +1,19 @@
 create database bd_aula03;
+\c bd_aula03;
 
-\ c bd_aula03;
+create table tbl_cliente(codigo_cliente integer PRIMARY KEY, nome text NOT NULL, cidade text, endereco text);
 
-create table tbl_cliente (
-	codigo_cliente integer primary key,
-	Nome varchar not null,
-	Cidade varchar,
-	Endereco varchar
-);
+CREATE DOMAIN chk_categoria text CHECK(VALUE= 'DRAMA' OR VALUE='COMEDIA');
+create table tbl_titulo(codigo_titulo integer PRIMARY KEY, titulo text NOT NULL, categoria chk_categoria);
 
-create table tbl_titulo (
-	codigo_titulo integer primary key,
-	titulo varchar Not null,
-	descricao varchar,
-	categoria text
-);
+create table tbl_emprestimo(numero_emprestimo integer PRIMARY KEY, codigo_cliente integer, codigo_livro integer);
 
-create table tbl_emprestimo (
-	numero_cliente integer primary key,
-	codigo_cliente integer,
-	codigo_livro integer
-);
+CREATE DOMAIN chk_status text CHECK(VALUE='DISPONIVEL' OR VALUE='ALUGADO');
+create table tbl_livros(cod_livro integer PRIMARY KEY, codigo_titulo integer, status chk_status);
 
-create table tbl_livros (
-	cod_livro integer primary key,
-	codigo_titulo integer,
-	status text
-);
+ALTER TABLE tbl_livros add constraint fk_codigo foreign key(codigo_titulo) references tbl_titulo(codigo_titulo);
+ALTER TABLE tbl_emprestimo add constraint fk_codigo foreign key(codigo_cliente) references tbl_cliente(codigo_cliente);
+ALTER TABLE tbl_emprestimo add constraint fk_codigo_livro_emprestimo foreign key(codigo_cliente) references tbl_livros(cod_livro);
 
-create domain categoria_tipo text check (
-	value = 'drama'
-	or value = 'comedia'
-);
-
-ALTER TABLE
-	tbl_titulo
-ALTER COLUMN
-	categoria
-set
-	data type categoria_tipo;
-
-create domain status_chk text check (
-	value = 'disponivel'
-	or value = 'indisponivel'
-);
-
-ALTER TABLE
-	tbl_livros
-alter column
-	status
-set
-	data type status_chk;
-
-ALTER TABLE
-	tbl_livros
-ADD
-	CONSTRAINT FKlivro_titulo FOREIGN KEY (codigo_titulo) REFERENCES tbl_titulo (codigo_titulo);
-
-ALTER TABLE
-	tbl_emprestimo
-ADD
-	CONSTRAINT FKemprestimo_livro FOREIGN KEY (codigo_livro) REFERENCES tbl_livros (cod_livro);
-
-ALTER TABLE
-	tbl_emprestimo
-ADD
-	CONSTRAINT FKemprestimo_cliente FOREIGN KEY (codigo_cliente) REFERENCES tbl_cliente (codigo_cliente);
+ALTER TABLE tbl_livros
+ALTER COLUMN status set default 'disponivel';

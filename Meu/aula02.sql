@@ -1,111 +1,31 @@
 create database bd_sistema_bancario;
+\c bd_sistema_bancario;
+create table tabela01(codigo integer);
+create table tabela02(conta integer);
+create table tabela03(agencia integer);
+create table tabela04(nome char);
+create table tabela05(valor float);
+CREATE TABLE cliente(NOME_CLIENTE varchar(50), CIDADE_CLIENTE varchar(50),ENDERECO_CLIENTE varchar(50));
+CREATE TABLE conta(NUMERO_CONTA integer, NOME_AGENCIA varchar(15),SALDO real);
+CREATE TABLE emprestimo(NUMERO_EMPRESTIMO integer, NOME_AGENCIA varchar(15),VALOR real);
+CREATE TABLE agencia(NOME_AGENCIA varchar(15),CIDADE_AGENCIA varchar(30), DEPOSITOS real);
+DROP TABLE TABELA01;
+DROP TABLE TABELA02;
+DROP TABLE TABELA03;
+DROP TABLE TABELA04;
+DROP TABLE TABELA05;
 
-\ l;
+ALTER TABLE cliente ADD COLUMN idade integer;
+ALTER TABLE cliente RENAME COLUMN idade TO idades;
+ALTER TABLE cliente ADD COLUMN cpf integer;
+ALTER TABLE cliente RENAME to tbl_cliente;
 
-\ c bd_sistema_bancario;
+ALTER TABLE conta RENAME to tbl_conta;
 
-create table tabela1 (
-	inteiro integer,
-	caracteres char,
-	caracteresvar varchar,
-	truefalse boolean,
-	reall real,
-	datas date
-);
+ALTER TABLE emprestimo RENAME to tbl_emprestimo;
 
-create table tabela2 (
-	inteiro integer,
-	caracteres char,
-	caracteresvar varchar,
-	truefalse boolean,
-	reall real,
-	datas date
-);
 
-create table tabela3 (
-	inteiro integer,
-	caracteres char,
-	caracteresvar varchar,
-	truefalse boolean,
-	reall real,
-	datas date
-);
+ALTER TABLE agencia RENAME COLUMN cidade_agencia to endereco_agencia;
+ALTER TABLE agencia RENAME to tbl_agencia;
 
-create table tabela4 (
-	inteiro integer,
-	caracteres char,
-	caracteresvar varchar,
-	truefalse boolean,
-	reall real,
-	datas date
-);
-
-create table tabela5 (
-	inteiro integer,
-	caracteres char,
-	caracteresvar varchar,
-	truefalse boolean,
-	reall real,
-	datas date
-);
-
-create table cliente(
-	nome_cliente varchar(50),
-	cidade_cliente varchar(50),
-	endereco_cliente varchar(50)
-);
-
-create table conta(
-	numero_conta integer,
-	nome_agencia varchar(15),
-	saldo real
-);
-
-create table emprestimo(
-	numero_emprestimo integer,
-	nome_agencia varchar(15),
-	valor real
-);
-
-create table agencia(
-	nome_agencia varchar(15),
-	cidade_agencia varchar(30),
-	depositos integer
-);
-
-drop table tabela1;
-
-drop table tabela2;
-
-drop table tabela3;
-
-drop table tabela4;
-
-drop table tabela5;
-
-alter table
-	cliente rename to tbl_cliente;
-
-alter table
-	tbl_cliente
-add
-	column idade integer;
-
-alter table
-	tbl_cliente
-add
-	column cpf integer;
-
-alter table
-	conta rename to tbl_conta;
-
-alter table
-	emprestimo rename to tbl_emprestimo;
-
-alter table
-	agencia rename to tbl_agencia;
-
-alter table
-	tbl_agencia rename column cidade_agencia to endereco_agencia;
-
-create schema Eduardo;
+create schema heclair;
