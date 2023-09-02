@@ -18,24 +18,35 @@ INSERT INTO tbl_estoque(cod_fornecedor, cod_peca, quantidade) values
 (1,1,30),(2,1,30),(3,2,10),(3,3,50);
 
 --Listar o nome dos fornecedores(maiusculo) e das peças(minusculo) que se situam na mesma cidade, ordenado pelo nome
+SELECT UPPER(f.nome), LOWER(p.nome)
+FROM tbl_fornecedor f, tbl_peca p
+WHERE p.cidade = f.cidade
+ORDER BY f.nome ASC;
 
 --listar as cidades onde existem fornecedores (sem valores duplicados)
 
+
 --Listar o nome e a cor das peças do fornecedor com código 3, ordenado pelo nome da peça
+
 
 --Listar o nome e a cidade dos fornecedores com mais de 10 peças.Contar só as peças de código 1. 
 
+
 --Listar a quantidade total de peças com código 1, fornecidas pelos fornecedores.
+
 
 --Listar a média dos preços das peças fornecidas pelo fornecedor com código 3.
 
+
 --lista o valor da pecas mais cara e a mais barata.
+
 
 --listar a quantidade de peças cadastradas
 
+
 --listar a quantidade de cidades diferentes onde existem peças cadastradas
 
--- listar a media dos precos de todas as peças, com somente 1 digito após a virgula.
 
+-- listar a media dos precos de todas as peças, com somente 1 digito após a virgula.
 
 
