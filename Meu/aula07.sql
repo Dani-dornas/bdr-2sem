@@ -24,16 +24,28 @@ WHERE p.cidade = f.cidade
 ORDER BY f.nome ASC;
 
 --listar as cidades onde existem fornecedores (sem valores duplicados)
-
+SELECT DISTINCT(cidade) 
+FROM tbl_fornecedor;
 
 --Listar o nome e a cor das peças do fornecedor com código 3, ordenado pelo nome da peça
-
+SELECT t.nome, t.cor
+FROM tbl_peca t
+INNER JOIN tbl_estoque e ON t.cod_peca=e.cod_peca  
+INNER JOIN tbl_fornecedor f ON f.cod_fornecedor=e.cod_fornecedor   
+WHERE f.cod_fornecedor = 3 
+ORDER BY t.nome ASC;
 
 --Listar o nome e a cidade dos fornecedores com mais de 10 peças.Contar só as peças de código 1. 
-
+SELECT t.nome, t.cidade 
+FROM tbl_fornecedor t
+INNER JOIN tbl_estoque e ON t.cod_fornecedor=e.cod_fornecedor   
+INNER JOIN tbl_peca p ON e.cod_peca=p.cod_peca    
+WHERE e.quantidade > 10 AND e.cod_peca = 1; 
 
 --Listar a quantidade total de peças com código 1, fornecidas pelos fornecedores.
-
+SELECT sum(quantidade) 
+FROM tbl_estoque
+WHERE cod_peca = 1;
 
 --Listar a média dos preços das peças fornecidas pelo fornecedor com código 3.
 
