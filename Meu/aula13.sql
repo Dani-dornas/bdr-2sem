@@ -1,5 +1,5 @@
-create database bd_aula11;
-\c bd_aula11
+create database bd_aula13;
+\c bd_aula13
 
 create table tbl_cidades(
 cod_cidade serial primary key,
@@ -156,7 +156,7 @@ INSERT INTO tbl_empregados (nome, data_nascimento, endereco, sexo, salario, cod_
 ('Luciana Ferreira', '1991-05-11', 'Avenida da Cachoeira, 9876, Curitiba, PR', 'F', 5400.00, 15),
 ('André Oliveira', '1986-02-14', 'Rua das Cascatas, 5432, Maceió, AL', 'M', 5300.00, 17),
 ('Patrícia Gomes', '1990-11-29', 'Avenida das Dunas, 8765, Vitória, ES', 'F', 5100.00, 18),
-('Felipe Pereira', '1987-03-06', 'Rua da Serra, 1357, Palmas, TO', 'M', 5700.00, 19),
+('Felipe Pereira', '1987-03-06', 'Rua da Serra, 1357, Palmas, TO', 'M', 5710.00, 19),
 ('Laura Ribeiro', '1992-06-08', 'Avenida das Ondas, 8642, João Pessoa, PB', 'F', 5200.00, 20),
 ('Roberto Alves', '1988-12-01', 'Rua dos Lagos, 2468, Teresina, PI', 'M', 5400.00, 20),
 ('Aline Barbosa', '1993-04-17', 'Avenida dos Rios, 9753, Boa Vista, RR', 'F', 5100.00, 20),
@@ -184,79 +184,92 @@ INSERT INTO tbl_empregados (nome, data_nascimento, endereco, sexo, salario, cod_
 -- exercicios
 
 
---1 crie uma store procedure chamada proc_upd_nome_depart para atualizar o nome de um departamento. 
---recebe como parametro um codigo inteiro e um novonome em texto atualizando o nome do departamento com esse respectivo codigo
-    CREATE OR REPLACE PROCEDURE proc_upd_nome_depart (p_cod_departamento INT, p_novo_nome TEXT)
+--1 Crie uma funcao denominada fc_soma que recebe dois valores inteiros e retorna o valor resultante da soma de ambos
+    CREATE OR REPLACE FUNCTION fc_soma(valor1 integer, valor2 integer)
+    RETURNS integer
     LANGUAGE plpgsql AS $$
+    DECLARE
+        resultado integer;
     BEGIN
-        UPDATE tbl_departamentos
-        SET nome = p_novo_nome 
-        WHERE cod_departamento = p_cod_departamento;
-    END $$;
-    CALL proc_upd_nome_depart(1, 'Novo Nome');
-
-    SELECT * FROM tbl_departamentos ORDER BY cod_departamento;
-
---2 crie uma store procedure chamada proc_copiatbl que cria uma copia da tabela tbl_cidades toda vez que for executada;
-    CREATE OR REPLACE PROCEDURE proc_copiatbl()
-    LANGUAGE plpgsql AS $$
-    BEGIN
-        DROP TABLE IF EXISTS tbl_cidades_copia;
-        CREATE TABLE tbl_cidades_copia AS SELECT * FROM tbl_cidades;
+        resultado := valor1 + valor2;
+        RETURN resultado;
     END $$;
 
-    CALL proc_copiatbl();
+    SELECT fc_soma(5,8);
+    SELECT fc_soma(2,4);
 
-    SELECT * FROM tbl_cidades_copia;
-
-
---3 crie uma store procedure chamada proc_novoprojeto que adiciona um novo projeto na tabela tbl_projetos
---recebe como parametros o nome do projeto e o codigo do departamento
-    CREATE OR REPLACE PROCEDURE proc_novoprojeto(IN p_nome_projeto TEXT, IN p_cod_departamento INT)
+--2 Crie uma funcao denominada fc_maior_salario, que sem usar função agregada MAX, retorne o nome do empregado com o maior salario.
+    CREATE OR REPLACE FUNCTION fc_maior_salario()
+    RETURNS text
     LANGUAGE plpgsql AS $$
+    DECLARE
+        maior_salario real;
+        nome_empregado text;
     BEGIN
-        INSERT INTO tbl_projetos (nome, cod_departamento)
-        VALUES (p_nome_projeto, p_cod_departamento);
+        SELECT salario INTO maior_salario FROM tbl_empregados ORDER BY salario DESC LIMIT 1;
+        SELECT nome INTO nome_empregado FROM tbl_empregados WHERE salario = maior_salario;
+        RETURN nome_empregado;
     END $$;
 
-    CALL proc_novoprojeto('Novo Projeto', 1);
+    SELECT * from tbl_empregados;
 
-    SELECT * FROM tbl_projetos;
+    SELECT fc_maior_salario();
 
---4 crie uma store procedure chamada proc_delprojeto que deleta um projeto da tbl_projetos
--- recebe como parametro o codigo do projeto
-    CREATE OR REPLACE PROCEDURE proc_delprojeto(IN p_cod_projeto INT)
+--3 crie a funcao fc_media_salario que retorna a media dos salarios dos empregados
+    CREATE OR REPLACE FUNCTION fc_media_salario()
+    RETURNS real
     LANGUAGE plpgsql AS $$
+    DECLARE
+        media_salario real;
     BEGIN
-        DELETE FROM tbl_projetos
-        WHERE cod_projeto = p_cod_projeto;
+        SELECT avg(salario) INTO media_salario FROM tbl_empregados;
+        RETURN media_salario;
     END $$;
 
-    CALL proc_delprojeto(1);
+    SELECT fc_media_salario();
 
-    SELECT * FROM tbl_projetos;
-
---5 crie uma store procedure chamada proc_projeto_arquivado que recebe o codigo de um projeto.
---a procedure devera criar uma tabela chamada tbl_projetos_arquivados, caso ela nao exista. tabela deve ter 2 colunas: codigo_projeto e nome.
---a procedure deve salvar o projeto do codigo recebido na tbl_projetos_arquivados e deleta-la da tabela tbl_projetos.
-    CREATE OR REPLACE PROCEDURE proc_projeto_arquivado(IN p_cod_projeto INT)
+--4 Crie a funcao fc_salarios que recebe o código do empregado como parâmetro e retorne o salário, o salário acrescido de 10% e o salário reduzido em 15%.
+    CREATE OR REPLACE FUNCTION fc_salarios(codigo_empregado int)
+    RETURNS TABLE (salario_original real, salario_acrescido real, salario_reduzido real)
     LANGUAGE plpgsql AS $$
     BEGIN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tbl_projetos_arquivados') THEN
-            CREATE TABLE tbl_projetos_arquivados (
-                codigo_projeto SERIAL PRIMARY KEY,
-                nome TEXT
-            );
-    END IF;
-        INSERT INTO tbl_projetos_arquivados (nome)
-        SELECT nome
+        RETURN QUERY
+        SELECT
+            salario::real AS salario_original,
+            (salario * 1.10)::real AS salario_acrescido,
+            (salario * 0.85)::real AS salario_reduzido
+        FROM tbl_empregados
+        WHERE cod_empregado = codigo_empregado;
+    END $$;
+
+    SELECT * FROM fc_salarios(1);
+
+--5 Crie uma funcao denominada fc_projetos que liste o código e o nome de todos os projetos cadastrados.
+    CREATE OR REPLACE FUNCTION fc_projetos()
+    RETURNS TABLE (cod_projeto int, nome text)
+    LANGUAGE plpgsql AS $$
+    BEGIN
+        RETURN QUERY
+        SELECT p.cod_projeto, p.nome FROM tbl_projetos p;
+    END $$;
+
+    SELECT * FROM fc_projetos();
+
+--6 Crie a funcao fc_proj_departmento que recebe o codigo do departamento e mostra quantos projetos o departamento possui
+    CREATE OR REPLACE FUNCTION fc_proj_departamento(codigo_departamento int)
+    RETURNS integer
+    LANGUAGE plpgsql AS $$
+    DECLARE
+        quantidade_projetos integer;
+    BEGIN
+        SELECT COUNT(*) INTO quantidade_projetos
         FROM tbl_projetos
-        WHERE cod_projeto = p_cod_projeto;
-        DELETE FROM tbl_projetos
-        WHERE cod_projeto = p_cod_projeto;
+        WHERE cod_departamento = codigo_departamento;
+    
+        RETURN quantidade_projetos;
     END $$;
 
-    CALL proc_projeto_arquivado(3);
+    SELECT fc_proj_departamento(4);
+    SELECT fc_proj_departamento(14);
 
-    SELECT * FROM tbl_projetos;
-    SELECT * FROM tbl_projetos_arquivados;
+
